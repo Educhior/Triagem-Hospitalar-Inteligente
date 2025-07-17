@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursos de Acessibilidade - Sistema Hospitalar Inteligente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="description" content="Recursos de acessibilidade do sistema de triagem hospitalar">
+    <a href="#main-content" class="skip-link">Ir para o conteúdo principal</a>
+</head>
+<body>
+    <header role="banner">
+        <nav aria-label="Navegação principal">
+            <div class="nav-container">
+                <div class="logo">
+                    <h1>🏥 Triagem Hospitalar IA</h1>
+                </div>
+                <ul class="nav-menu" role="menubar">
+                    <li role="none"><a href="{{ url_for('index') }}" role="menuitem">Início</a></li>
+                    <li role="none"><a href="{{ url_for('triagem') }}" role="menuitem">Triagem</a></li>
+                    <li role="none"><a href="{{ url_for('sobre') }}" role="menuitem">Sobre</a></li>
+                    <li role="none"><a href="{{ url_for('acessibilidade') }}" role="menuitem" aria-current="page">Acessibilidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" role="main">
+        <div class="container">
+            <section class="page-header" aria-labelledby="acessibilidade-title">
+                <h2 id="acessibilidade-title">Recursos de Acessibilidade</h2>
+                <p class="page-description">
+                    Nosso sistema foi desenvolvido com foco total na acessibilidade, 
+                    garantindo que todos os profissionais de saúde possam utilizá-lo 
+                    de forma eficiente e independente.
+                </p>
+            </section>
+
+            <section class="content-section" aria-labelledby="compromisso-title">
+                <h3 id="compromisso-title">Nosso Compromisso</h3>
+                <p>
+                    Acreditamos que a tecnologia deve ser inclusiva e acessível a todos. 
+                    O Sistema de Triagem Hospitalar Inteligente foi projetado seguindo 
+                    rigorosamente as diretrizes de acessibilidade WCAG 2.1 nível AA, 
+                    garantindo que profissionais com diferentes necessidades possam 
+                    utilizar o sistema com eficiência.
+                </p>
+            </section>
+
+            <section class="content-section" aria-labelledby="recursos-title">
+                <h3 id="recursos-title">Recursos Implementados</h3>
+                
+                <div class="accessibility-features">
+                    <div class="feature-category">
+                        <h4>🔍 Compatibilidade com Leitores de Tela</h4>
+                        <ul>
+                            <li>Estrutura semântica HTML5 adequada</li>
+                            <li>Atributos ARIA para elementos complexos</li>
+                            <li>Descrições detalhadas de campos de formulário</li>
+                            <li>Anúncios de status e mudanças de estado</li>
+                            <li>Rotulagem clara de todos os elementos interativos</li>
+                            <li>Regiões de conteúdo bem definidas</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-category">
+                        <h4>⌨️ Navegação por Teclado</h4>
+                        <ul>
+                            <li>Acesso completo via teclado a todos os recursos</li>
+                            <li>Ordem de tabulação lógica e intuitiva</li>
+                            <li>Indicadores visuais de foco bem definidos</li>
+                            <li>Atalhos de teclado para funções principais</li>
+                            <li>Navegação com setas em grupos de opções</li>
+                            <li>Skip links para navegação rápida</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-category">
+                        <h4>🎨 Design Visual Acessível</h4>
+                        <ul>
+                            <li>Contraste adequado em todos os elementos</li>
+                            <li>Cores não como única forma de informação</li>
+                            <li>Textos redimensionáveis até 200%</li>
+                            <li>Ícones com descrições textuais</li>
+                            <li>Layout responsivo para diferentes dispositivos</li>
+                            <li>Suporte a modo escuro automático</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-category">
+                        <h4>🔤 Tipografia e Legibilidade</h4>
+                        <ul>
+                            <li>Fontes legíveis e espaçamento adequado</li>
+                            <li>Tamanho de fonte ajustável</li>
+                            <li>Alinhamento consistente de texto</li>
+                            <li>Hierarquia visual clara com cabeçalhos</li>
+                            <li>Comprimento de linha otimizado</li>
+                            <li>Espaçamento entre elementos suficiente</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-category">
+                        <h4>📱 Responsividade</h4>
+                        <ul>
+                            <li>Funciona perfeitamente em dispositivos móveis</li>
+                            <li>Elementos de toque adequadamente dimensionados</li>
+                            <li>Orientação flexível (portrait/landscape)</li>
+                            <li>Zoom até 400% sem perda de funcionalidade</li>
+                            <li>Compatível com tecnologias assistivas móveis</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-category">
+                        <h4>⚡ Performance e Estabilidade</h4>
+                        <ul>
+                            <li>Carregamento rápido para não bloquear assistivas</li>
+                            <li>Funcionamento offline quando possível</li>
+                            <li>Tratamento robusto de erros</li>
+                            <li>Feedback claro sobre o estado do sistema</li>
+                            <li>Timeouts adequados para interações</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" aria-labelledby="atalhos-title">
+                <h3 id="atalhos-title">Atalhos de Teclado</h3>
+                <p>Para facilitar a navegação e uso do sistema, implementamos os seguintes atalhos:</p>
+                
+                <div class="shortcuts-grid">
+                    <div class="shortcut-item">
+                        <kbd>Alt + T</kbd>
+                        <span>Ir para a página de triagem</span>
+                    </div>
+                    
+                    <div class="shortcut-item">
+                        <kbd>Alt + H</kbd>
+                        <span>Voltar à página inicial</span>
+                    </div>
+                    
+                    <div class="shortcut-item">
+                        <kbd>Escape</kbd>
+                        <span>Limpar formulário (com confirmação)</span>
+                    </div>
+                    
+                    <div class="shortcut-item">
+                        <kbd>Tab</kbd>
+                        <span>Navegar para o próximo elemento</span>
+                    </div>
+                    
+                    <div class="shortcut-item">
+                        <kbd>Shift + Tab</kbd>
+                        <span>Navegar para o elemento anterior</span>
+                    </div>
+                    
+                    <div class="shortcut-item">
+                        <kbd>Enter</kbd>
+                        <span>Ativar botão ou link focado</span>
+                    </div>
+                    
+                    <div class="shortcut-item">
+                        <kbd>Setas</kbd>
+                        <span>Navegar em grupos de opções</span>
+                    </div>
+                    
+                    <div class="shortcut-item">
+                        <kbd>Espaço</kbd>
+                        <span>Marcar/desmarcar checkbox</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" aria-labelledby="compatibilidade-title">
+                <h3 id="compatibilidade-title">Compatibilidade com Tecnologias Assistivas</h3>
+                <p>O sistema foi testado e é compatível com:</p>
+                
+                <div class="compatibility-grid">
+                    <div class="compatibility-item">
+                        <h4>🖥️ Leitores de Tela</h4>
+                        <ul>
+                            <li>NVDA (Windows)</li>
+                            <li>JAWS (Windows)</li>
+                            <li>VoiceOver (macOS/iOS)</li>
+                            <li>TalkBack (Android)</li>
+                            <li>Orca (Linux)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="compatibility-item">
+                        <h4>🔍 Ampliadores de Tela</h4>
+                        <ul>
+                            <li>Windows Magnifier</li>
+                            <li>ZoomText</li>
+                            <li>macOS Zoom</li>
+                            <li>Zoom nativo do navegador</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="compatibility-item">
+                        <h4>⌨️ Navegação Alternativa</h4>
+                        <ul>
+                            <li>Switch navigation</li>
+                            <li>Eye tracking</li>
+                            <li>Voice control</li>
+                            <li>Teclados alternativos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="compatibility-item">
+                        <h4>🌐 Navegadores</h4>
+                        <ul>
+                            <li>Chrome/Chromium</li>
+                            <li>Firefox</li>
+                            <li>Safari</li>
+                            <li>Edge</li>
+                            <li>Opera</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" aria-labelledby="personalização-title">
+                <h3 id="personalização-title">Opções de Personalização</h3>
+                <p>O sistema respeita as preferências do usuário e oferece:</p>
+                
+                <div class="customization-options">
+                    <div class="option-item">
+                        <h4>🎨 Preferências de Cor</h4>
+                        <p>Suporte automático a modo escuro baseado nas configurações do sistema operacional</p>
+                    </div>
+                    
+                    <div class="option-item">
+                        <h4>🔤 Tamanho da Fonte</h4>
+                        <p>Respeita as configurações de zoom do navegador e permite ampliação até 400%</p>
+                    </div>
+                    
+                    <div class="option-item">
+                        <h4>🎭 Redução de Movimento</h4>
+                        <p>Desativa animações automáticas para usuários com preferência por movimento reduzido</p>
+                    </div>
+                    
+                    <div class="option-item">
+                        <h4>🔊 Alto Contraste</h4>
+                        <p>Suporte a modos de alto contraste do sistema operacional</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" aria-labelledby="padroes-title">
+                <h3 id="padroes-title">Padrões e Diretrizes Seguidos</h3>
+                <div class="standards-list">
+                    <div class="standard-item">
+                        <h4>📋 WCAG 2.1 Nível AA</h4>
+                        <p>Seguimos rigorosamente as Diretrizes de Acessibilidade para Conteúdo Web</p>
+                    </div>
+                    
+                    <div class="standard-item">
+                        <h4>🏛️ Seção 508</h4>
+                        <p>Conformidade com os padrões de acessibilidade do governo americano</p>
+                    </div>
+                    
+                    <div class="standard-item">
+                        <h4>🌐 WAI-ARIA</h4>
+                        <p>Uso adequado de atributos ARIA para elementos complexos</p>
+                    </div>
+                    
+                    <div class="standard-item">
+                        <h4>📱 Mobile Accessibility</h4>
+                        <p>Diretrizes específicas para acessibilidade em dispositivos móveis</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" aria-labelledby="feedback-title">
+                <h3 id="feedback-title">Feedback e Melhorias</h3>
+                <p>
+                    Estamos sempre trabalhando para melhorar a acessibilidade do sistema. 
+                    Se você encontrar alguma barreira ou tiver sugestões de melhoria, 
+                    sua contribuição é muito valiosa.
+                </p>
+                
+                <div class="feedback-options">
+                    <div class="feedback-item">
+                        <h4>📧 Contato</h4>
+                        <p>Entre em contato conosco para reportar problemas de acessibilidade</p>
+                    </div>
+                    
+                    <div class="feedback-item">
+                        <h4>🔄 Atualizações</h4>
+                        <p>Realizamos atualizações regulares baseadas no feedback dos usuários</p>
+                    </div>
+                    
+                    <div class="feedback-item">
+                        <h4>🧪 Testes</h4>
+                        <p>Testamos continuamente com usuários reais de tecnologias assistivas</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" aria-labelledby="recursos-emergencia-title">
+                <h3 id="recursos-emergencia-title">Recursos para Situações de Emergência</h3>
+                <p>Em situações críticas, o sistema oferece recursos especiais:</p>
+                
+                <div class="emergency-features">
+                    <div class="emergency-item">
+                        <h4>🚨 Alertas Sonoros</h4>
+                        <p>Sinais sonoros para casos de emergência (respeitando preferências do usuário)</p>
+                    </div>
+                    
+                    <div class="emergency-item">
+                        <h4>🔴 Indicadores Visuais</h4>
+                        <p>Cores e ícones claros para identificação rápida de casos críticos</p>
+                    </div>
+                    
+                    <div class="emergency-item">
+                        <h4>⚡ Acesso Rápido</h4>
+                        <p>Atalhos para funções críticas durante emergências</p>
+                    </div>
+                    
+                    <div class="emergency-item">
+                        <h4>📱 Compatibilidade Mobile</h4>
+                        <p>Funcionamento completo em dispositivos móveis para mobilidade</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section" aria-labelledby="treinamento-title">
+                <h3 id="treinamento-title">Recursos de Treinamento</h3>
+                <p>Para facilitar o aprendizado e uso do sistema:</p>
+                
+                <div class="training-resources">
+                    <div class="training-item">
+                        <h4>📚 Documentação</h4>
+                        <p>Guias detalhados sobre como usar o sistema com tecnologias assistivas</p>
+                    </div>
+                    
+                    <div class="training-item">
+                        <h4>🎥 Vídeos</h4>
+                        <p>Tutoriais em vídeo com legendas e audiodescrição</p>
+                    </div>
+                    
+                    <div class="training-item">
+                        <h4>🔊 Áudio</h4>
+                        <p>Guias em áudio para usuários de leitores de tela</p>
+                    </div>
+                    
+                    <div class="training-item">
+                        <h4>🤝 Suporte</h4>
+                        <p>Suporte especializado para usuários com necessidades específicas</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="container">
+            <p>&copy; 2024 Sistema de Triagem Hospitalar Inteligente</p>
+            <p>Comprometidos com a acessibilidade e inclusão digital</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

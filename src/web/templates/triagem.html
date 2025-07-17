@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triagem - Sistema Hospitalar Inteligente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="description" content="Formulário de triagem hospitalar com inteligência artificial">
+    <a href="#main-content" class="skip-link">Ir para o conteúdo principal</a>
+</head>
+<body>
+    <header role="banner">
+        <nav aria-label="Navegação principal">
+            <div class="nav-container">
+                <div class="logo">
+                    <h1>🏥 Triagem Hospitalar IA</h1>
+                </div>
+                <ul class="nav-menu" role="menubar">
+                    <li role="none"><a href="{{ url_for('index') }}" role="menuitem">Início</a></li>
+                    <li role="none"><a href="{{ url_for('triagem') }}" role="menuitem" aria-current="page">Triagem</a></li>
+                    <li role="none"><a href="{{ url_for('sobre') }}" role="menuitem">Sobre</a></li>
+                    <li role="none"><a href="{{ url_for('acessibilidade') }}" role="menuitem">Acessibilidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" role="main">
+        <div class="container">
+            <section class="triagem-header" aria-labelledby="triagem-title">
+                <h2 id="triagem-title">Sistema de Triagem Inteligente</h2>
+                <p class="triagem-description">
+                    Preencha os dados do paciente para realizar a classificação de risco utilizando 
+                    inteligência artificial. Todos os campos são importantes para uma avaliação precisa.
+                </p>
+            </section>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages" role="alert">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="triagem-form" novalidate>
+                <fieldset>
+                    <legend>Dados Demográficos</legend>
+                    
+                    <div class="form-group">
+                        <label for="idade">Idade (anos) *</label>
+                        <input type="number" id="idade" name="idade" min="0" max="120" required 
+                               aria-describedby="idade-help">
+                        <div id="idade-help" class="help-text">Digite a idade em anos completos</div>
+                    </div>
+
+                    <div class="form-group">
+                        <fieldset>
+                            <legend>Sexo *</legend>
+                            <div class="radio-group">
+                                <input type="radio" id="sexo-m" name="sexo" value="M" required>
+                                <label for="sexo-m">Masculino</label>
+                                
+                                <input type="radio" id="sexo-f" name="sexo" value="F" required>
+                                <label for="sexo-f">Feminino</label>
+                            </div>
+                        </fieldset>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Sinais Vitais</legend>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pressao_sistolica">Pressão Sistólica (mmHg) *</label>
+                            <input type="number" id="pressao_sistolica" name="pressao_sistolica" 
+                                   min="60" max="300" step="1" required
+                                   aria-describedby="pressao-help">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="pressao_diastolica">Pressão Diastólica (mmHg) *</label>
+                            <input type="number" id="pressao_diastolica" name="pressao_diastolica" 
+                                   min="30" max="200" step="1" required>
+                        </div>
+                    </div>
+                    <div id="pressao-help" class="help-text">
+                        Exemplo: 120/80 mmHg (sistólica/diastólica)
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frequencia_cardiaca">Frequência Cardíaca (bpm) *</label>
+                            <input type="number" id="frequencia_cardiaca" name="frequencia_cardiaca" 
+                                   min="30" max="250" step="1" required
+                                   aria-describedby="fc-help">
+                            <div id="fc-help" class="help-text">Batimentos por minuto</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="saturacao_oxigenio">Saturação de Oxigênio (%) *</label>
+                            <input type="number" id="saturacao_oxigenio" name="saturacao_oxigenio" 
+                                   min="50" max="100" step="0.1" required
+                                   aria-describedby="sat-help">
+                            <div id="sat-help" class="help-text">Porcentagem de saturação</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="temperatura">Temperatura (°C) *</label>
+                        <input type="number" id="temperatura" name="temperatura" 
+                               min="30" max="45" step="0.1" required
+                               aria-describedby="temp-help">
+                        <div id="temp-help" class="help-text">Temperatura corporal em graus Celsius</div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Sintomas Principais</legend>
+                    <div class="checkbox-group">
+                        <div class="form-group">
+                            <input type="checkbox" id="dor_peito" name="dor_peito" value="1">
+                            <label for="dor_peito">Dor no peito</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="checkbox" id="dificuldade_respiratoria" name="dificuldade_respiratoria" value="1">
+                            <label for="dificuldade_respiratoria">Dificuldade respiratória</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="checkbox" id="febre" name="febre" value="1">
+                            <label for="febre">Febre</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="checkbox" id="tontura" name="tontura" value="1">
+                            <label for="tontura">Tontura</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="checkbox" id="vomito" name="vomito" value="1">
+                            <label for="vomito">Vômito</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="checkbox" id="dor_abdominal" name="dor_abdominal" value="1">
+                            <label for="dor_abdominal">Dor abdominal</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-large">
+                        Realizar Triagem
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="preencherExemplo()">
+                        Preencher Exemplo
+                    </button>
+                    <button type="reset" class="btn btn-outline">
+                        Limpar Formulário
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="container">
+            <p>&copy; 2024 Sistema de Triagem Hospitalar Inteligente</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Função para preencher dados de exemplo
+        async function preencherExemplo() {
+            try {
+                const response = await fetch('/paciente-exemplo');
+                const data = await response.json();
+                
+                document.getElementById('idade').value = data.idade;
+                document.getElementById('sexo-' + data.sexo.toLowerCase()).checked = true;
+                document.getElementById('pressao_sistolica').value = data.pressao_sistolica;
+                document.getElementById('pressao_diastolica').value = data.pressao_diastolica;
+                document.getElementById('frequencia_cardiaca').value = data.frequencia_cardiaca;
+                document.getElementById('saturacao_oxigenio').value = data.saturacao_oxigenio;
+                document.getElementById('temperatura').value = data.temperatura;
+                
+                // Sintomas
+                document.getElementById('dor_peito').checked = data.dor_peito;
+                document.getElementById('dificuldade_respiratoria').checked = data.dificuldade_respiratoria;
+                document.getElementById('febre').checked = data.febre;
+                document.getElementById('tontura').checked = data.tontura;
+                document.getElementById('vomito').checked = data.vomito;
+                document.getElementById('dor_abdominal').checked = data.dor_abdominal;
+                
+            } catch (error) {
+                console.error('Erro ao carregar exemplo:', error);
+                alert('Erro ao carregar dados de exemplo');
+            }
+        }
+
+        // Validação em tempo real
+        document.getElementById('pressao_diastolica').addEventListener('input', function() {
+            const sistolica = parseInt(document.getElementById('pressao_sistolica').value);
+            const diastolica = parseInt(this.value);
+            
+            if (diastolica && sistolica && diastolica >= sistolica) {
+                this.setCustomValidity('A pressão diastólica deve ser menor que a sistólica');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>

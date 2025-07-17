@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado da Triagem - Sistema Hospitalar Inteligente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="description" content="Resultado da classificação de risco da triagem hospitalar">
+    <a href="#main-content" class="skip-link">Ir para o conteúdo principal</a>
+</head>
+<body>
+    <header role="banner">
+        <nav aria-label="Navegação principal">
+            <div class="nav-container">
+                <div class="logo">
+                    <h1>🏥 Triagem Hospitalar IA</h1>
+                </div>
+                <ul class="nav-menu" role="menubar">
+                    <li role="none"><a href="{{ url_for('index') }}" role="menuitem">Início</a></li>
+                    <li role="none"><a href="{{ url_for('triagem') }}" role="menuitem">Triagem</a></li>
+                    <li role="none"><a href="{{ url_for('sobre') }}" role="menuitem">Sobre</a></li>
+                    <li role="none"><a href="{{ url_for('acessibilidade') }}" role="menuitem">Acessibilidade</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" role="main">
+        <div class="container">
+            <section class="resultado-header" aria-labelledby="resultado-title">
+                <h2 id="resultado-title">Resultado da Triagem</h2>
+                <p class="resultado-description">
+                    Análise realizada com sucesso utilizando inteligência artificial.
+                </p>
+            </section>
+
+            <div class="resultado-card">
+                <div class="classificacao-principal">
+                    <div class="risco-badge risco-{{ result.risk_color.lower() }}">
+                        <span class="risco-emoji">
+                            {% if result.risk_color == 'VERMELHO' %}🔴
+                            {% elif result.risk_color == 'AMARELO' %}🟡
+                            {% else %}🟢
+                            {% endif %}
+                        </span>
+                        <div class="risco-info">
+                            <h3>{{ result.classification }}</h3>
+                            <p class="risco-nivel">Nível: {{ result.risk_color }}</p>
+                            <p class="confianca" role="status" aria-live="polite">
+                                Confiança: {{ (result.confidence * 100) | round(1) }}%
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resultado-detalhes">
+                    <section aria-labelledby="raciocinio-title">
+                        <h4 id="raciocinio-title">Raciocínio da IA</h4>
+                        <p class="raciocinio-texto">{{ result.reasoning }}</p>
+                    </section>
+
+                    <section aria-labelledby="recomendacoes-title">
+                        <h4 id="recomendacoes-title">Recomendações</h4>
+                        <ul class="recomendacoes-lista">
+                            {% for recomendacao in result.recommendations %}
+                                <li>{{ recomendacao }}</li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+
+                    <section aria-labelledby="protocolo-title">
+                        <h4 id="protocolo-title">Protocolo de Atendimento</h4>
+                        <div class="protocolo-info">
+                            {% if result.risk_color == 'VERMELHO' %}
+                                <div class="protocolo-emergencia">
+                                    <h5>⚠️ EMERGÊNCIA</h5>
+                                    <p><strong>Tempo de atendimento:</strong> IMEDIATO</p>
+                                    <p><strong>Prioridade:</strong> Máxima</p>
+                                    <p><strong>Ações:</strong> Acionar equipe médica, preparar sala de emergência</p>
+                                </div>
+                            {% elif result.risk_color == 'AMARELO' %}
+                                <div class="protocolo-urgente">
+                                    <h5>⚡ URGENTE</h5>
+                                    <p><strong>Tempo de atendimento:</strong> Até 1 hora</p>
+                                    <p><strong>Prioridade:</strong> Alta</p>
+                                    <p><strong>Ações:</strong> Monitorização, reavaliação em 30 minutos</p>
+                                </div>
+                            {% else %}
+                                <div class="protocolo-nao-urgente">
+                                    <h5>✅ NÃO URGENTE</h5>
+                                    <p><strong>Tempo de atendimento:</strong> Até 4 horas</p>
+                                    <p><strong>Prioridade:</strong> Normal</p>
+                                    <p><strong>Ações:</strong> Aguardar na fila, orientações gerais</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </section>
+                </div>
+
+                <div class="resultado-meta">
+                    <p class="timestamp">
+                        <strong>Data/Hora:</strong> {{ result.timestamp }}
+                    </p>
+                    <p class="disclaimer">
+                        <strong>Importante:</strong> Este resultado é uma sugestão baseada em IA e deve ser 
+                        validado por um profissional de saúde qualificado.
+                    </p>
+                </div>
+            </div>
+
+            <div class="resultado-acoes">
+                <a href="{{ url_for('triagem') }}" class="btn btn-primary">
+                    Nova Triagem
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    Imprimir Resultado
+                </button>
+                <button onclick="salvarResultado()" class="btn btn-outline">
+                    Salvar Resultado
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer role="contentinfo">
+        <div class="container">
+            <p>&copy; 2024 Sistema de Triagem Hospitalar Inteligente</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        function salvarResultado() {
+            const resultado = {
+                classificacao: "{{ result.classification }}",
+                risco: "{{ result.risk_color }}",
+                confianca: {{ result.confidence }},
+                raciocinio: "{{ result.reasoning }}",
+                recomendacoes: {{ result.recommendations | tojson }},
+                timestamp: "{{ result.timestamp }}"
+            };
+            
+            const blob = new Blob([JSON.stringify(resultado, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resultado_triagem_' + new Date().toISOString().slice(0, 10) + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Anunciar resultado para leitores de tela
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultado = "{{ result.classification }}";
+            const confianca = {{ (result.confidence * 100) | round(1) }};
+            
+            // Criar anúncio acessível
+            const anuncio = document.createElement('div');
+            anuncio.setAttribute('aria-live', 'assertive');
+            anuncio.setAttribute('aria-atomic', 'true');
+            anuncio.className = 'sr-only';
+            anuncio.textContent = `Resultado da triagem: ${resultado} com ${confianca}% de confiança`;
+            
+            document.body.appendChild(anuncio);
+            
+            // Focar no resultado
+            document.getElementById('resultado-title').focus();
+        });
+    </script>
+</body>
+</html>
