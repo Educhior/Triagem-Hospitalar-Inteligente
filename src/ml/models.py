@@ -1,3 +1,19 @@
+if __name__ == "__main__":
+    print("Treinando modelo de triagem hospitalar com dados reais (data.csv)...")
+    modelo, resultados = TriageMLModel.treinar_com_csv('data.csv', model_type='random_forest')
+    print("\nResumo do Treinamento:")
+    print(f"Acurácia: {resultados.get('accuracy', 0):.3f}")
+    print(f"Acurácia média (cross-val): {resultados.get('cv_mean', 0):.3f} ± {resultados.get('cv_std', 0):.3f}")
+    print("\nMatriz de Confusão:")
+    for linha in resultados.get('confusion_matrix', []):
+        print(linha)
+    print("\nRelatório de Classificação:")
+    for classe, metrica in resultados.get('classification_report', {}).items():
+        if isinstance(metrica, dict):
+            print(f"Classe {classe}: precisão={metrica.get('precision', 0):.2f}, revocação={metrica.get('recall', 0):.2f}, f1={metrica.get('f1-score', 0):.2f}")
+    # Exemplo de como salvar o modelo treinado
+    modelo.save_model('modelo_triagem.joblib')
+    print("\nModelo salvo em 'modelo_triagem.joblib'.")
 """
 Modelos de Machine Learning para Triagem Hospitalar
 Implementação de Naive Bayes e Random Forest
@@ -38,6 +54,27 @@ class TriageMLModel:
             )
         else:
             raise ValueError(f"Tipo de modelo não suportado: {model_type}")
+
+    @staticmethod
+    def carregar_dados_csv(caminho_csv: str = 'data.csv') -> pd.DataFrame:
+        """
+        Carrega os dados do arquivo data.csv para DataFrame
+        """
+        df = pd.read_csv(caminho_csv)
+        return df
+
+    @classmethod
+    def treinar_com_csv(cls, caminho_csv: str = 'data.csv', model_type: str = 'naive_bayes'):
+        """
+        Cria e treina o modelo usando os dados do data.csv
+        """
+        df = cls.carregar_dados_csv(caminho_csv)
+        # Separar features e target
+        X = df.drop(['risk_level', 'timestamp'], axis=1)
+        y = df['risk_level']
+        model = cls(model_type=model_type)
+        resultados = model.train(X, y)
+        return model, resultados
     
     def prepare_features(self, data: pd.DataFrame) -> pd.DataFrame:
         """
