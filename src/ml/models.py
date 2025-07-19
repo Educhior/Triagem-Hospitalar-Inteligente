@@ -3,7 +3,7 @@ if __name__ == "__main__":
     import os
     # Importar a própria classe para execução direta
     from src.ml.models import TriageMLModel
-    caminho_csv = 'data.csv'
+    caminho_csv = 'auto'  # Sempre usar os dois arquivos da pasta data
     if len(sys.argv) > 1:
         caminho_csv = sys.argv[1]
     print(f"Treinando modelo de triagem hospitalar com dados: {caminho_csv} ...")
@@ -22,8 +22,10 @@ if __name__ == "__main__":
     modelo.save_model('modelo_triagem.joblib')
     print("\nModelo salvo em 'modelo_triagem.joblib'.")
 
+
 import numpy as np
 import pandas as pd
+import os
 from typing import Dict, Tuple
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.naive_bayes import GaussianNB
@@ -59,21 +61,37 @@ class TriageMLModel:
 
     @staticmethod
     def carregar_dados_csv(caminho_csv: str = 'data_utf8.csv') -> pd.DataFrame:
-        # Carrega dados de um CSV, detectando delimitador e encoding
-        try:
-            # Detectar delimitador automaticamente
+        # Carrega dados de um ou mais CSVs, detectando delimitador e encoding
+        arquivos = []
+        if caminho_csv == 'auto':
+            # Modo automático: tenta unir data/data.csv e data/sample_dataset.csv se existirem
+            for arq in ['data/data.csv', 'data/sample_dataset.csv']:
+                if os.path.exists(arq):
+                    arquivos.append(arq)
+            if not arquivos:
+                raise FileNotFoundError('Nenhum arquivo de dados encontrado.')
+        else:
             if caminho_csv.endswith('.csv'):
-                # Tenta ler com delimitador padrão
-                try:
-                    df = pd.read_csv(caminho_csv, encoding='utf-8')
-                except Exception:
-                    df = pd.read_csv(caminho_csv, delimiter=';', encoding='latin1')
-                return df
+                arquivos = [caminho_csv]
             else:
                 raise ValueError('Arquivo não suportado')
-        except Exception as e:
-            logger.error(f"Erro ao ler o CSV: {e}")
-            raise
+
+        dfs = []
+        for arq in arquivos:
+            try:
+                try:
+                    df = pd.read_csv(arq, encoding='utf-8')
+                except Exception:
+                    df = pd.read_csv(arq, delimiter=';', encoding='latin1')
+                dfs.append(df)
+            except Exception as e:
+                logger.error(f"Erro ao ler o CSV {arq}: {e}")
+                raise
+        if len(dfs) == 1:
+            return dfs[0]
+        else:
+            # Concatenar e resetar índice
+            return pd.concat(dfs, ignore_index=True)
 
     @classmethod
     def treinar_com_csv(cls, caminho_csv: str = 'data_utf8.csv', model_type: str = 'naive_bayes'):
