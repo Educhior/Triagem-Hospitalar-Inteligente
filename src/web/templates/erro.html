@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Erro {{ error_code }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #fafafa; color: #333; text-align: center; padding: 40px; }
+        .container { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; display: inline-block; padding: 32px 48px; }
+        h1 { color: #c00; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Erro {{ error_code }}</h1>
+        <p>{{ error_message }}</p>
+        <a href="{{ url_for('index') }}">Voltar para o início</a>
+    </div>
+</body>
+</html>

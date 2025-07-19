@@ -1,4 +1,5 @@
 if __name__ == "__main__":
+    from models import TriageMLModel
     print("Treinando modelo de triagem hospitalar com dados reais (data.csv)...")
     modelo, resultados = TriageMLModel.treinar_com_csv('data.csv', model_type='random_forest')
     print("\nResumo do Treinamento:")
@@ -19,8 +20,10 @@ Modelos de Machine Learning para Triagem Hospitalar
 Implementação de Naive Bayes e Random Forest
 """
 
+
 import numpy as np
 import pandas as pd
+from typing import Dict, Tuple
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
@@ -56,22 +59,69 @@ class TriageMLModel:
             raise ValueError(f"Tipo de modelo não suportado: {model_type}")
 
     @staticmethod
-    def carregar_dados_csv(caminho_csv: str = 'data.csv') -> pd.DataFrame:
+    def carregar_dados_csv(caminho_csv: str = 'data_utf8.csv') -> pd.DataFrame:
         """
         Carrega os dados do arquivo data.csv para DataFrame
         """
-        df = pd.read_csv(caminho_csv)
-        return df
+        try:
+            df = pd.read_csv(caminho_csv, delimiter=';', encoding='latin1')
+            return df
+        except Exception as e:
+            logger.error(f"Erro ao ler o CSV: {e}")
+            raise
 
     @classmethod
-    def treinar_com_csv(cls, caminho_csv: str = 'data.csv', model_type: str = 'naive_bayes'):
+    def treinar_com_csv(cls, caminho_csv: str = 'data_utf8.csv', model_type: str = 'naive_bayes'):
         """
-        Cria e treina o modelo usando os dados do data.csv
+        Cria e treina o modelo usando os dados do data_utf8.csv, usando KTAS_RN como target.
+        Faz o mapeamento das colunas do dataset para os nomes esperados pelo modelo.
         """
         df = cls.carregar_dados_csv(caminho_csv)
-        # Separar features e target
-        X = df.drop(['risk_level', 'timestamp'], axis=1)
-        y = df['risk_level']
+
+        # Mapeamento de colunas do CSV para nomes esperados
+        col_map = {
+            'SBP': 'pressao_sistolica',
+            'DBP': 'pressao_diastolica',
+            'HR': 'frequencia_cardiaca',
+            'Saturation': 'saturacao_oxigenio',
+            'BT': 'temperatura',
+            'Age': 'idade',
+            'Sex': 'sexo_M',
+            # Sintomas binários (exemplo: dor_peito, dificuldade_respiratoria, febre, tontura, vomito, dor_abdominal)
+            # O dataset não tem essas colunas, então vamos criar sinteticamente como 0
+        }
+        for old, new in col_map.items():
+            if old in df.columns:
+                df[new] = df[old]
+
+        # Converter sexo para binário (1 = masculino, 0 = feminino)
+        if 'sexo_M' in df.columns:
+            df['sexo_M'] = df['sexo_M'].apply(lambda x: 1 if str(x).strip() in ['1', 'M', 'm', 'Masculino', 'masculino'] else 0)
+        else:
+            df['sexo_M'] = 0
+
+        # Criar colunas de sintomas como 0 (não presentes)
+        sintomas = ['dor_peito', 'dificuldade_respiratoria', 'febre', 'tontura', 'vomito', 'dor_abdominal']
+        for sint in sintomas:
+            if sint not in df.columns:
+                df[sint] = 0
+
+        # Selecionar apenas as colunas numéricas esperadas pelo modelo
+        features_cols = [
+            'pressao_sistolica', 'pressao_diastolica', 'frequencia_cardiaca',
+            'saturacao_oxigenio', 'temperatura', 'idade', 'sexo_M',
+            'dor_peito', 'dificuldade_respiratoria', 'febre', 'tontura', 'vomito', 'dor_abdominal'
+        ]
+        X = df[features_cols].copy()
+        # Converter para numérico e tratar valores inválidos
+        for col in features_cols:
+            X[col] = pd.to_numeric(X[col], errors='coerce')
+            if X[col].isnull().any():
+                mediana = X[col].median()
+                X[col] = X[col].fillna(mediana)
+
+        y = df['KTAS_RN']
+
         model = cls(model_type=model_type)
         resultados = model.train(X, y)
         return model, resultados

@@ -32,7 +32,7 @@ class PatientData:
     
     # Dados demográficos
     idade: int
-    sexo: str  # 'M' ou 'F'
+    sexo: str
     
     # Sintomas principais
     dor_peito: bool
@@ -50,26 +50,21 @@ class TriageResult:
     reasoning: str
     recommendations: List[str]
 
+from src.ml.models import TriageMLModel
+
 class TriageAgent:
-    """
-    Agente Inteligente para Triagem Hospitalar
-    Arquitetura PEAS:
-    - Performance: Acurácia, F1-Score, tempo de resposta
-    - Environment: Sistema hospitalar simulado
-    - Actuators: Interface de classificação
-    - Sensors: Formulário de entrada de dados
-    """
-    
-    def __init__(self):
-        self.model = None
-        self.is_trained = False
-        
-    def perceive(self, patient_data: PatientData) -> Dict:
-        """
-        Sensors: Percepção dos dados do paciente
-        """
+    def __init__(self, model_path: str = 'modelo_triagem.joblib'):
+        self.model = TriageMLModel(model_type='random_forest')
         try:
-            # Converter dados do paciente para formato processável
+            self.model.load_model(model_path)
+            self.is_trained = self.model.is_trained
+            logger.info(f"Modelo de ML carregado de {model_path}")
+        except Exception as e:
+            logger.error(f"Não foi possível carregar o modelo de ML: {e}")
+            self.is_trained = False
+
+    def perceive(self, patient_data: PatientData) -> Dict:
+        try:
             features = {
                 'pressao_sistolica': patient_data.pressao_sistolica,
                 'pressao_diastolica': patient_data.pressao_diastolica,
@@ -85,77 +80,45 @@ class TriageAgent:
                 'vomito': 1 if patient_data.vomito else 0,
                 'dor_abdominal': 1 if patient_data.dor_abdominal else 0
             }
-            
             logger.info(f"Dados percebidos: {features}")
             return features
-            
         except Exception as e:
             logger.error(f"Erro na percepção: {e}")
             return {}
-    
+
     def reason(self, features: Dict) -> TriageResult:
-        """
-        Raciocínio probabilístico para classificação
-        Implementa regras baseadas em conhecimento médico
-        """
         try:
-            # Lógica de raciocínio baseada em regras
-            risk_score = 0
-            reasoning_factors = []
-            
-            # Avaliar sinais vitais críticos
-            if features['pressao_sistolica'] > 180 or features['pressao_sistolica'] < 90:
-                risk_score += 3
-                reasoning_factors.append("Pressão arterial crítica")
-            
-            if features['frequencia_cardiaca'] > 120 or features['frequencia_cardiaca'] < 50:
-                risk_score += 3
-                reasoning_factors.append("Frequência cardíaca alterada")
-            
-            if features['saturacao_oxigenio'] < 90:
-                risk_score += 4
-                reasoning_factors.append("Saturação de oxigênio baixa")
-            
-            if features['temperatura'] > 39.5:
-                risk_score += 2
-                reasoning_factors.append("Febre alta")
-            
-            # Avaliar sintomas críticos
-            if features['dor_peito'] and features['idade'] > 50:
-                risk_score += 4
-                reasoning_factors.append("Dor no peito em paciente > 50 anos")
-            
-            if features['dificuldade_respiratoria']:
-                risk_score += 3
-                reasoning_factors.append("Dificuldade respiratória")
-            
-            # Determinar nível de risco
-            if risk_score >= 7:
-                risk_level = RiskLevel.VERMELHO
-                confidence = min(0.95, 0.7 + (risk_score - 7) * 0.05)
-            elif risk_score >= 3:
-                risk_level = RiskLevel.AMARELO
-                confidence = min(0.90, 0.6 + (risk_score - 3) * 0.075)
-            else:
-                risk_level = RiskLevel.VERDE
-                confidence = min(0.85, 0.5 + risk_score * 0.1)
-            
-            # Gerar recomendações
-            recommendations = self._generate_recommendations(risk_level, reasoning_factors)
-            
+            if not self.is_trained:
+                raise Exception("Modelo de ML não está treinado ou carregado.")
+            import pandas as pd
+            X = pd.DataFrame([features])
+            pred, prob = self.model.predict(X)
+            risk_label = pred[0] if len(pred) > 0 else 'Desconhecido'
+            confidence = float(max(prob[0])) if len(prob) > 0 else 0.0
+            # Mapeamento para RiskLevel
+            risk_map = {
+                'Emergência': RiskLevel.VERMELHO,
+                'Urgente': RiskLevel.AMARELO,
+                'Não Urgente': RiskLevel.VERDE,
+                'VERMELHO': RiskLevel.VERMELHO,
+                'AMARELO': RiskLevel.AMARELO,
+                'VERDE': RiskLevel.VERDE
+            }
+            risk_level = risk_map.get(risk_label, RiskLevel.AMARELO)
+            reasoning = f"Classificação automática por modelo ML ({risk_label})"
+            recommendations = self._generate_recommendations(risk_level, [reasoning])
             return TriageResult(
                 risk_level=risk_level,
                 confidence_score=confidence,
-                reasoning="; ".join(reasoning_factors) if reasoning_factors else "Sinais vitais estáveis",
+                reasoning=reasoning,
                 recommendations=recommendations
             )
-            
         except Exception as e:
-            logger.error(f"Erro no raciocínio: {e}")
+            logger.error(f"Erro no raciocínio ML: {e}")
             return TriageResult(
                 risk_level=RiskLevel.AMARELO,
                 confidence_score=0.5,
-                reasoning="Erro na avaliação - requer avaliação médica",
+                reasoning=f"Erro na avaliação ML: {e}",
                 recommendations=["Consulta médica imediata"]
             )
     
