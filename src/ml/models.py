@@ -1,7 +1,13 @@
 if __name__ == "__main__":
-    from models import TriageMLModel
-    print("Treinando modelo de triagem hospitalar com dados reais (data.csv)...")
-    modelo, resultados = TriageMLModel.treinar_com_csv('data.csv', model_type='random_forest')
+    import sys
+    import os
+    # Importar a própria classe para execução direta
+    from src.ml.models import TriageMLModel
+    caminho_csv = 'data.csv'
+    if len(sys.argv) > 1:
+        caminho_csv = sys.argv[1]
+    print(f"Treinando modelo de triagem hospitalar com dados: {caminho_csv} ...")
+    modelo, resultados = TriageMLModel.treinar_com_csv(caminho_csv, model_type='random_forest')
     print("\nResumo do Treinamento:")
     print(f"Acurácia: {resultados.get('accuracy', 0):.3f}")
     print(f"Acurácia média (cross-val): {resultados.get('cv_mean', 0):.3f} ± {resultados.get('cv_std', 0):.3f}")
@@ -53,10 +59,18 @@ class TriageMLModel:
 
     @staticmethod
     def carregar_dados_csv(caminho_csv: str = 'data_utf8.csv') -> pd.DataFrame:
-        # Carrega dados de um CSV com codificação UTF-8
+        # Carrega dados de um CSV, detectando delimitador e encoding
         try:
-            df = pd.read_csv(caminho_csv, delimiter=';', encoding='latin1')
-            return df
+            # Detectar delimitador automaticamente
+            if caminho_csv.endswith('.csv'):
+                # Tenta ler com delimitador padrão
+                try:
+                    df = pd.read_csv(caminho_csv, encoding='utf-8')
+                except Exception:
+                    df = pd.read_csv(caminho_csv, delimiter=';', encoding='latin1')
+                return df
+            else:
+                raise ValueError('Arquivo não suportado')
         except Exception as e:
             logger.error(f"Erro ao ler o CSV: {e}")
             raise
@@ -75,22 +89,21 @@ class TriageMLModel:
             'BT': 'temperatura',
             'Age': 'idade',
             'Sex': 'sexo_M',
-            
         }
         for old, new in col_map.items():
             if old in df.columns:
                 df[new] = df[old]
 
-        # Converter sexo para binário (1 = masculino, 0 = feminino)
-        if 'sexo_M' in df.columns:
-            df['sexo_M'] = df['sexo_M'].apply(lambda x: 1 if str(x).strip() in ['1', 'M', 'm', 'Masculino', 'masculino'] else 0)
-        else:
-            df['sexo_M'] = 0
+        # Ajuste para datasets sintéticos (sample_dataset.csv)
+        if 'sexo' in df.columns and 'sexo_M' not in df.columns:
+            df['sexo_M'] = df['sexo'].apply(lambda x: 1 if str(x).strip().upper() == 'M' else 0)
 
-        # Criar colunas de sintomas como 0 (não presentes)
+        # Converter sintomas para int/bool se vierem como string
         sintomas = ['dor_peito', 'dificuldade_respiratoria', 'febre', 'tontura', 'vomito', 'dor_abdominal']
         for sint in sintomas:
-            if sint not in df.columns:
+            if sint in df.columns:
+                df[sint] = df[sint].apply(lambda x: 1 if str(x).strip().lower() in ['1', 'true', 'sim'] else 0)
+            else:
                 df[sint] = 0
 
         # Selecionar apenas as colunas numéricas esperadas pelo modelo
@@ -107,7 +120,13 @@ class TriageMLModel:
                 mediana = X[col].median()
                 X[col] = X[col].fillna(mediana)
 
-        y = df['KTAS_RN']
+        # Detectar coluna de target
+        if 'KTAS_RN' in df.columns:
+            y = df['KTAS_RN']
+        elif 'risk_level' in df.columns:
+            y = df['risk_level']
+        else:
+            raise ValueError('Coluna de target não encontrada (KTAS_RN ou risk_level)')
 
         model = cls(model_type=model_type)
         resultados = model.train(X, y)
