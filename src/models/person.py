@@ -1,8 +1,3 @@
-"""
-Modelo de Pessoa para Sistema de Triagem Hospitalar
-Inclui dados pessoais, histórico médico e classificação de risco
-"""
-
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any
 from datetime import datetime
@@ -10,20 +5,20 @@ from enum import Enum
 import uuid
 
 class RiskLevel(Enum):
-    """Classificação de risco baseada no protocolo de Manchester"""
+    # Classificação de risco baseada no protocolo de Manchester
     VERMELHO = "Emergência"      # Atendimento imediato
     AMARELO = "Urgente"          # Até 1 hora
     VERDE = "Não Urgente"        # Até 4 horas
 
 class Gender(Enum):
-    """Gênero do paciente"""
+    # Gênero do paciente
     MASCULINO = "M"
     FEMININO = "F"
     OUTRO = "O"
 
 @dataclass
 class VitalSigns:
-    """Sinais vitais do paciente"""
+    # Sinais vitais do paciente
     pressao_sistolica: float
     pressao_diastolica: float
     frequencia_cardiaca: float
@@ -34,7 +29,7 @@ class VitalSigns:
     nivel_consciencia: Optional[str] = None  # Alerta, confuso, inconsciente
     
     def __post_init__(self):
-        """Validação dos sinais vitais"""
+        # Validações dos sinais vitais
         if self.pressao_sistolica < 50 or self.pressao_sistolica > 250:
             raise ValueError("Pressão sistólica fora do range válido")
         if self.pressao_diastolica < 30 or self.pressao_diastolica > 150:
@@ -48,7 +43,7 @@ class VitalSigns:
 
 @dataclass
 class Symptoms:
-    """Sintomas apresentados pelo paciente"""
+    # Sintomas do paciente
     dor_peito: bool = False
     dificuldade_respiratoria: bool = False
     febre: bool = False
@@ -63,7 +58,7 @@ class Symptoms:
     palidez_extrema: bool = False
     
     def get_red_flag_symptoms(self) -> List[str]:
-        """Retorna sintomas que indicam emergência (vermelho)"""
+        # Retorna sintomas de bandeira vermelha
         red_flags = []
         if self.dor_peito:
             red_flags.append("Dor no peito")
@@ -81,7 +76,7 @@ class Symptoms:
 
 @dataclass
 class MedicalHistory:
-    """Histórico médico do paciente"""
+    # Histórico médico do paciente
     doencas_cronicas: List[str] = field(default_factory=list)
     medicamentos_uso: List[str] = field(default_factory=list)
     alergias: List[str] = field(default_factory=list)
@@ -108,7 +103,7 @@ class MedicalHistory:
 
 @dataclass
 class Person:
-    """Modelo completo de pessoa para triagem hospitalar"""
+    # Modelo completo de pessoa para triagem hospitalar
     # Identificação
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     nome: str = ""

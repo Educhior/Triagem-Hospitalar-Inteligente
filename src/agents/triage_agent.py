@@ -1,8 +1,3 @@
-"""
-Agente Inteligente para Triagem Hospitalar
-Implementação baseada em arquitetura PEAS
-"""
-
 import numpy as np
 import pandas as pd
 from typing import Dict, List, Tuple, Optional
@@ -15,14 +10,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class RiskLevel(Enum):
-    """Classificação de risco baseada no protocolo de Manchester"""
+    # Classificação de risco baseada no protocolo de Manchester
     VERMELHO = "Emergência"      # Atendimento imediato
     AMARELO = "Urgente"          # Até 1 hora
     VERDE = "Não Urgente"        # Até 4 horas
 
 @dataclass
 class PatientData:
-    """Dados do paciente para triagem"""
+    # Modelo de dados do paciente para triagem hospitalar
     # Sinais vitais
     pressao_sistolica: float
     pressao_diastolica: float
@@ -123,7 +118,7 @@ class TriageAgent:
             )
     
     def _generate_recommendations(self, risk_level: RiskLevel, factors: List[str]) -> List[str]:
-        """Gerar recomendações baseadas no nível de risco"""
+        # Gera recomendações baseadas no nível de risco
         recommendations = []
         
         if risk_level == RiskLevel.VERMELHO:
@@ -177,9 +172,6 @@ class TriageAgent:
             }
     
     def evaluate_performance(self, true_labels: List[str], predicted_labels: List[str]) -> Dict:
-        """
-        Performance: Avaliação do desempenho do agente
-        """
         try:
             from sklearn.metrics import accuracy_score, f1_score, classification_report
             
@@ -200,9 +192,6 @@ class TriageAgent:
             return {'accuracy': 0.0, 'f1_score': 0.0, 'error': str(e)}
     
     def process_patient(self, patient_data: PatientData) -> Dict:
-        """
-        Processo completo de triagem de um paciente
-        """
         try:
             # Percepção
             features = self.perceive(patient_data)

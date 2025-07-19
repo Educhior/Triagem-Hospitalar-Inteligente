@@ -1,8 +1,3 @@
-"""
-DAO (Data Access Object) para o modelo Person
-Gerencia operações de persistência e consulta de dados
-"""
-
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 import json
@@ -12,46 +7,37 @@ from abc import ABC, abstractmethod
 from .person import Person, RiskLevel, Gender, VitalSigns, Symptoms, MedicalHistory
 
 class PersonDAO(ABC):
-    """Interface abstrata para DAO de Person"""
     
     @abstractmethod
     def save(self, person: Person) -> bool:
-        """Salva uma pessoa"""
         pass
     
     @abstractmethod
     def get_by_id(self, person_id: str) -> Optional[Person]:
-        """Busca pessoa por ID"""
         pass
     
     @abstractmethod
     def get_all(self) -> List[Person]:
-        """Retorna todas as pessoas"""
         pass
     
     @abstractmethod
     def update(self, person: Person) -> bool:
-        """Atualiza uma pessoa"""
         pass
     
     @abstractmethod
     def delete(self, person_id: str) -> bool:
-        """Remove uma pessoa"""
         pass
     
     @abstractmethod
     def get_by_risk_level(self, risk_level: RiskLevel) -> List[Person]:
-        """Busca pessoas por nível de risco"""
         pass
 
 class InMemoryPersonDAO(PersonDAO):
-    """Implementação em memória do DAO"""
     
     def __init__(self):
         self._data: Dict[str, Person] = {}
     
     def save(self, person: Person) -> bool:
-        """Salva uma pessoa em memória"""
         try:
             self._data[person.id] = person
             return True
@@ -60,39 +46,32 @@ class InMemoryPersonDAO(PersonDAO):
             return False
     
     def get_by_id(self, person_id: str) -> Optional[Person]:
-        """Busca pessoa por ID"""
         return self._data.get(person_id)
     
     def get_all(self) -> List[Person]:
-        """Retorna todas as pessoas"""
         return list(self._data.values())
     
     def update(self, person: Person) -> bool:
-        """Atualiza uma pessoa"""
         if person.id in self._data:
             self._data[person.id] = person
             return True
         return False
     
     def delete(self, person_id: str) -> bool:
-        """Remove uma pessoa"""
         if person_id in self._data:
             del self._data[person_id]
             return True
         return False
     
     def get_by_risk_level(self, risk_level: RiskLevel) -> List[Person]:
-        """Busca pessoas por nível de risco"""
         return [person for person in self._data.values() 
                 if person.nivel_risco == risk_level]
     
     def get_emergency_queue(self) -> List[Person]:
-        """Retorna fila de emergência ordenada por prioridade"""
         emergency_patients = self.get_by_risk_level(RiskLevel.VERMELHO)
         return sorted(emergency_patients, key=lambda p: p.data_chegada)
     
     def get_waiting_time_stats(self) -> Dict[str, Any]:
-        """Retorna estatísticas de tempo de espera"""
         patients = self.get_all()
         if not patients:
             return {}
@@ -112,7 +91,6 @@ class InMemoryPersonDAO(PersonDAO):
         }
 
 class FilePersonDAO(PersonDAO):
-    """Implementação com persistência em arquivo JSON"""
     
     def __init__(self, file_path: str = "data/persons.json"):
         self.file_path = file_path
@@ -120,13 +98,11 @@ class FilePersonDAO(PersonDAO):
         self._load_data()
     
     def _ensure_directory(self):
-        """Garante que o diretório existe"""
         directory = os.path.dirname(self.file_path)
         if directory and not os.path.exists(directory):
             os.makedirs(directory)
     
     def _load_data(self) -> Dict[str, Dict]:
-        """Carrega dados do arquivo"""
         try:
             if os.path.exists(self.file_path):
                 with open(self.file_path, 'r', encoding='utf-8') as f:
@@ -137,7 +113,6 @@ class FilePersonDAO(PersonDAO):
             return {}
     
     def _save_data(self, data: Dict[str, Dict]) -> bool:
-        """Salva dados no arquivo"""
         try:
             with open(self.file_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
@@ -147,19 +122,14 @@ class FilePersonDAO(PersonDAO):
             return False
     
     def _dict_to_person(self, data: Dict) -> Person:
-        """Converte dicionário para Person"""
-        # Reconstruir sinais vitais
         vital_signs = None
         if data.get('sinais_vitais'):
             vital_signs = VitalSigns(**data['sinais_vitais'])
         
-        # Reconstruir sintomas
         symptoms = Symptoms(**data.get('sintomas', {}))
         
-        # Reconstruir histórico médico
         medical_history = MedicalHistory(**data.get('historico_medico', {}))
         
-        # Reconstruir person
         person_data = data.copy()
         person_data['sinais_vitais'] = vital_signs
         person_data['sintomas'] = symptoms
@@ -173,7 +143,6 @@ class FilePersonDAO(PersonDAO):
         return Person(**person_data)
     
     def _person_to_dict(self, person: Person) -> Dict:
-        """Converte Person para dicionário"""
         data = {
             'id': person.id,
             'nome': person.nome,
@@ -198,7 +167,6 @@ class FilePersonDAO(PersonDAO):
         return data
     
     def save(self, person: Person) -> bool:
-        """Salva uma pessoa no arquivo"""
         try:
             data = self._load_data()
             data[person.id] = self._person_to_dict(person)
@@ -208,7 +176,6 @@ class FilePersonDAO(PersonDAO):
             return False
     
     def get_by_id(self, person_id: str) -> Optional[Person]:
-        """Busca pessoa por ID"""
         try:
             data = self._load_data()
             if person_id in data:
@@ -219,7 +186,6 @@ class FilePersonDAO(PersonDAO):
             return None
     
     def get_all(self) -> List[Person]:
-        """Retorna todas as pessoas"""
         try:
             data = self._load_data()
             return [self._dict_to_person(person_data) for person_data in data.values()]
@@ -228,7 +194,6 @@ class FilePersonDAO(PersonDAO):
             return []
     
     def update(self, person: Person) -> bool:
-        """Atualiza uma pessoa"""
         try:
             data = self._load_data()
             if person.id in data:
@@ -240,7 +205,6 @@ class FilePersonDAO(PersonDAO):
             return False
     
     def delete(self, person_id: str) -> bool:
-        """Remove uma pessoa"""
         try:
             data = self._load_data()
             if person_id in data:
@@ -252,7 +216,6 @@ class FilePersonDAO(PersonDAO):
             return False
     
     def get_by_risk_level(self, risk_level: RiskLevel) -> List[Person]:
-        """Busca pessoas por nível de risco"""
         try:
             all_persons = self.get_all()
             return [person for person in all_persons 
@@ -262,14 +225,12 @@ class FilePersonDAO(PersonDAO):
             return []
 
 class EmergencyPersonService:
-    """Serviço especializado para gerenciar pessoas em estágio vermelho"""
     
     def __init__(self, dao: PersonDAO):
         self.dao = dao
     
     def create_emergency_patient(self, nome: str, idade: int, cpf: str = "", 
                                 queixa_principal: str = "") -> Person:
-        """Cria um paciente de emergência com dados mínimos"""
         person = Person(
             nome=nome,
             idade=idade,
@@ -283,7 +244,6 @@ class EmergencyPersonService:
     def add_vital_signs(self, person: Person, pressao_sistolica: float,
                        pressao_diastolica: float, frequencia_cardiaca: float,
                        saturacao_oxigenio: float, temperatura: float) -> bool:
-        """Adiciona sinais vitais a um paciente"""
         try:
             person.sinais_vitais = VitalSigns(
                 pressao_sistolica=pressao_sistolica,
@@ -303,7 +263,6 @@ class EmergencyPersonService:
             return False
     
     def add_symptoms(self, person: Person, **symptoms) -> bool:
-        """Adiciona sintomas a um paciente"""
         try:
             for symptom, value in symptoms.items():
                 if hasattr(person.sintomas, symptom):
@@ -319,7 +278,6 @@ class EmergencyPersonService:
             return False
     
     def get_emergency_queue(self) -> List[Person]:
-        """Retorna fila de emergência ordenada por prioridade e tempo"""
         emergency_patients = self.dao.get_by_risk_level(RiskLevel.VERMELHO)
         return sorted(emergency_patients, key=lambda p: (
             p.calculate_risk_score(),  # Maior score primeiro
@@ -327,17 +285,14 @@ class EmergencyPersonService:
         ), reverse=True)
     
     def get_critical_patients(self) -> List[Person]:
-        """Retorna pacientes críticos (score > 7)"""
         emergency_patients = self.get_emergency_queue()
         return [p for p in emergency_patients if p.calculate_risk_score() > 7]
     
     def save_emergency_patient(self, person: Person) -> bool:
-        """Salva paciente de emergência"""
         person.nivel_risco = RiskLevel.VERMELHO
         return self.dao.save(person)
     
     def get_emergency_stats(self) -> Dict[str, Any]:
-        """Retorna estatísticas de emergência"""
         emergency_patients = self.get_emergency_queue()
         critical_patients = self.get_critical_patients()
         
