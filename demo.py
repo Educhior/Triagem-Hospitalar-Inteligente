@@ -1,8 +1,3 @@
-"""
-Demonstração do Sistema de Triagem Hospitalar Inteligente
-Execute este arquivo para ver o sistema funcionando
-"""
-
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))

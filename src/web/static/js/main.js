@@ -396,7 +396,7 @@ function fillFormWithData(data) {
     });
     
     // Sexo
-    if (data.sexo) {
+    if (typeof data.sexo === 'string' && data.sexo.length > 0) {
         const sexoRadio = document.getElementById(`sexo-${data.sexo.toLowerCase()}`);
         if (sexoRadio) {
             sexoRadio.checked = true;

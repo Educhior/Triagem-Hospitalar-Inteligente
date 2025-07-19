@@ -25,7 +25,7 @@
     <main id="main-content" role="main">
         <div class="container">
             <section class="resultado-header" aria-labelledby="resultado-title">
-                <h2 id="resultado-title">Resultado da Triagem</h2>
+                <h2 id="resultado-title" tabindex="-1">Resultado da Triagem</h2>
                 <p class="resultado-description">
                     Análise realizada com sucesso utilizando inteligência artificial.
                 </p>
@@ -129,12 +129,12 @@
     <script>
         function salvarResultado() {
             const resultado = {
-                classificacao: "{{ result.classification }}",
-                risco: "{{ result.risk_color }}",
-                confianca: {{ result.confidence }},
-                raciocinio: "{{ result.reasoning }}",
+                classificacao: {{ result.classification | tojson }},
+                risco: {{ result.risk_color | tojson }},
+                confianca: {{ result.confidence | tojson }},
+                raciocinio: {{ result.reasoning | tojson }},
                 recomendacoes: {{ result.recommendations | tojson }},
-                timestamp: "{{ result.timestamp }}"
+                timestamp: {{ result.timestamp | tojson }}
             };
             
             const blob = new Blob([JSON.stringify(resultado, null, 2)], {
@@ -151,7 +151,7 @@
 
         // Anunciar resultado para leitores de tela
         document.addEventListener('DOMContentLoaded', function() {
-            const resultado = "{{ result.classification }}";
+            const resultado = {{ result.classification | tojson }};
             const confianca = {{ (result.confidence * 100) | round(1) }};
             
             // Criar anúncio acessível

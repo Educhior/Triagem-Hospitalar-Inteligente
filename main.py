@@ -1,7 +1,3 @@
-"""
-Script principal para execução do sistema de triagem
-"""
-
 import sys
 import os
 
@@ -9,7 +5,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.web.app import app
-from src.utils.data_generator import TriageDataGenerator
+from src.utils.data_generator import DataGenerator
 from src.agents.triage_agent import TriageAgent, PatientData, RiskLevel
 import logging
 
@@ -21,9 +17,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def main():
-    """
-    Função principal do sistema
-    """
     try:
         logger.info("Iniciando Sistema de Triagem Hospitalar Inteligente")
         
@@ -43,14 +36,11 @@ def main():
         sys.exit(1)
 
 def run_demo():
-    """
-    Executar demonstração do sistema
-    """
     logger.info("Executando demonstração do sistema")
     
     # Criar instâncias
     agent = TriageAgent()
-    data_generator = TriageDataGenerator()
+    data_generator = DataGenerator()
     
     # Gerar dados de exemplo
     logger.info("Gerando dados de exemplo...")
@@ -118,12 +108,9 @@ def run_demo():
     generate_statistics()
 
 def generate_statistics():
-    """
-    Gerar estatísticas do sistema
-    """
     try:
         logger.info("Gerando dataset de teste...")
-        data_generator = TriageDataGenerator()
+        data_generator = DataGenerator()
         
         # Criar dataset de teste
         dataset = data_generator.generate_synthetic_data(n_samples=100)
