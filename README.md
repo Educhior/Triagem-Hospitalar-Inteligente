@@ -87,6 +87,3 @@ Emergências hospitalares frequentemente enfrentam superlotação, causando atra
    Isso irá rodar uma simulação de triagem e gerar estatísticas no terminal.
 
 ---
-
-## Contribuição
-Este projeto foi desenvolvido como parte de estudos em Inteligência Artificial, baseado nos conceitos de Russell e Norvig. Sinta-se livre para contribuir!
